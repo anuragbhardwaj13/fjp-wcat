@@ -1,46 +1,105 @@
 // 1) node wcat.js filepath => displays the contents of a file in terminal
 // 2) node wcat.js filepath1 filepath2 filepath3  => displays the content of all files in terminal in concatinated form in given order
-// 3) node wcat.js -n file1 file 2 file3 OR node wcat.js -n file1 
+// 3) node wcat.js -n file1 file 2 file3 OR node wcat.js -n file1
 //node wcat.js f1.txt
 //node wcat.js f1.txt f2.txt f3.txt
 const fs = require("fs");
 // let input = process.argv;
 // console.log(input);
 let inputArr = process.argv.slice(2);
-console.log(inputArr);
+// console.log(inputArr);
 let filesArr = [];
 let optionsArr = [];
 //===============> placed files path in filesArr <=============
-for (let i = 0; i < inputArr.length; i++){
-    let firstChar = inputArr[i].charAt(0);
-    // console.log(firstChar);
-    if (firstChar == '-') {
-        optionsArr.push(inputArr[i]);
-    }
-    else {
-        filesArr.push(inputArr[i]);
-    }
+for (let i = 0; i < inputArr.length; i++) {
+  let firstChar = inputArr[i].charAt(0);
+  // console.log(firstChar);
+  if (firstChar == "-") {
+    optionsArr.push(inputArr[i]);
+  } else {
+    filesArr.push(inputArr[i]);
+  }
 }
 // console.log("file to be read are " + filesArr);
 
 //=============>check if all the files are present<============= //
-for (let i = 0; i < filesArr.length; i++){
-    let doesExist = fs.existsSync(filesArr[i]);
-    if (!doesExist) {
-        console.log("One or more File(s) do not exist ");
-        return;
-        // break;
-    }
+for (let i = 0; i < filesArr.length; i++) {
+  let doesExist = fs.existsSync(filesArr[i]);
+  if (!doesExist) {
+    console.log("One or more File(s) do not exist ");
+    return;
+    // break;
+  }
 }
 
 // =============>content read and appending starts<=============//
 let content = "";
-for (let i = 0; i < filesArr.length; i++){
-    let fileContent = fs.readFileSync(filesArr[i]);
-    content = content + fileContent + "\n";
-                     
+for (let i = 0; i < filesArr.length; i++) {
+  let fileContent = fs.readFileSync(filesArr[i]);
+  content = content + fileContent + "\n";
 }
-console.log(content);
+// console.log(content);
 
 let contentArr = content.split("\r\n");
-console.log(contentArr);
+// console.log(contentArr);
+let isPresent = optionsArr.includes("-s");
+if (isPresent) {
+  for (let i = 0; i < contentArr.length; i++) {
+    if (contentArr[i] == "" && contentArr[i - 1] == "") {
+      contentArr[i] = null;
+    } else if (contentArr[i] == "" && contentArr[i - 1] == null) {
+      contentArr[i] = null;
+    }
+  }
+//   console.table(contentArr);
+    let tempArr = [];
+    //push everything in tempArr except null
+    for (let i = 0; i < contentArr.length; i++){
+        if (contentArr[i] != null) {
+            tempArr.push(contentArr[i]);
+        }
+    }
+    for(let i=0;i<tempArr.length;i++){
+        console.log(tempArr[i]);
+    }
+    
+    contentArr=tempArr;
+}
+
+let indexOfN=optionsArr.indexOf("-n");
+let indexOfB=optionsArr.indexOf("-b");
+let finalOption="";
+if(indexOfN!=-1&&indexOfB!=-1){
+    if(indexOfN<indexOfB){
+        finalOption="-n";
+    }else{
+        finalOption="-b"
+    }
+    
+}else{
+    if(indexOfN!=-1){
+        finalOption="-n";
+    }else if(indexOfB!=-1){
+        finalOption="-b";
+    }
+}
+let count=1;
+if(finalOption=="-n"){
+    modifyByN();
+}else if(finalOption=="-b"){
+    modifyByB();
+}
+function modifyByN(){
+    for(let i=0;i<contentArr.length;i++){
+        console.log((i+1)+". "+contentArr[i])
+    }
+}
+
+function modifyByB(){
+    for(let i=0;i<contentArr.length;i++){
+        if(contentArr[i]!=""){
+            console.log(count+". "+contentArr[i]);
+            count++;
+        }
+    }
+}
